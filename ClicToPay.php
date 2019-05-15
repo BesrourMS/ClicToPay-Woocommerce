@@ -1,42 +1,44 @@
 <?php
 /*
- * Plugin Name: WooCommerce ClickToPay Payment Gateway
+ * Plugin Name: WooCommerce ClicToPay Payment Gateway
  * Plugin URI: https://rudrastyh.com/woocommerce/payment-gateway-plugin.html
- * Description: Take credit card payments on your store.
+ * Description: Accept tunisian credit card payments on your store.
  * Author: Mohamed Safouan Besrour
  * Author URI: https://besrourms.github.io
  * Version: 1.0
  */
-
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly
+}
 /*
  * This action hook registers our PHP class as a WooCommerce payment gateway
  */
-add_filter( 'woocommerce_payment_gateways', 'ClickToPay_add_gateway_class' );
+add_filter( 'woocommerce_payment_gateways', 'ClicToPay_add_gateway_class' );
 
-function ClickToPay_add_gateway_class( $gateways ) {
-	$gateways[] = 'WC_ClickToPay_Gateway'; // your class name is here
+function ClicToPay_add_gateway_class( $gateways ) {
+	$gateways[] = 'WC_ClicToPay_Gateway';
 	return $gateways;
 }
  
 /*
  * The class itself, please note that it is inside plugins_loaded action hook
  */
-add_action( 'plugins_loaded', 'ClickToPay_init_gateway_class' );
+add_action( 'plugins_loaded', 'ClicToPay_init_gateway_class' );
 
-function ClickToPay_init_gateway_class() {
+function ClicToPay_init_gateway_class() {
  
-	class WC_ClickToPay_Gateway extends WC_Payment_Gateway {
+	class WC_ClicToPay_Gateway extends WC_Payment_Gateway {
  
  		/**
  		 * Class constructor, more about it in Step 3
  		 */
  		public function __construct() {
  
-			$this->id = 'ClickToPay'; // payment gateway plugin ID
+			$this->id = 'ClicToPay'; // payment gateway plugin ID
 			$this->icon = ''; // URL of the icon that will be displayed on checkout page near your gateway name
-			$this->has_fields = true; // in case you need a custom credit card form
-			$this->method_title = 'ClickToPay Gateway';
-			$this->method_description = 'Description of ClickToPay payment gateway'; // will be displayed on the options page
+			$this->has_fields = false; // in case you need a custom credit card form
+			$this->method_title = 'ClicToPay Gateway';
+			$this->method_description = 'Description of ClicToPay payment gateway'; // will be displayed on the options page
 		 
 			// gateways can support subscriptions, refunds, saved payment methods,
 			// but in this tutorial we begin with simple payments
@@ -74,7 +76,7 @@ function ClickToPay_init_gateway_class() {
 			$this->form_fields = array(
 				'enabled' => array(
 					'title'       => 'Enable/Disable',
-					'label'       => 'Enable ClickToPay Gateway',
+					'label'       => 'Enable ClicToPay Gateway',
 					'type'        => 'checkbox',
 					'description' => '',
 					'default'     => 'no'
