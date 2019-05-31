@@ -1,2 +1,3 @@
 # ClickToPay-Woocommerce
-ClickToPay Woocommerce Plugin
+ClickToPay Woocommerce Plugin ( Under development )
+
