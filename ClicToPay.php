@@ -171,7 +171,7 @@ function ClicToPay_init_gateway_class() {
 				    'password'          =>  $this->$ClicToPay_sandbox_Password,
 				    'orderNumber'       =>  $this->$order_id,
 				    'amount'            =>  $order->get_total();
-							'currency'			=>	788;
+				    'currency'		=>  788;
 				);
 
 				$redirect = $this->sandbox_URL;
@@ -183,7 +183,7 @@ function ClicToPay_init_gateway_class() {
 				    'password'          =>  $this->$ClicToPay_production_Password,
 				    'orderNumber'       =>  $this->$order_id,
 				    'amount'            =>  $order->get_total();
-							'currency'			=>	788;
+				    'currency'		=>  788;
 				);
 
 				$redirect = $this->production_URL;
@@ -204,7 +204,7 @@ function ClicToPay_init_gateway_class() {
  
 					// Redirect to the thank you page
 					return array(
-						'result'    => 'success',
+						'result'   => 'success',
 						'redirect' => $this->get_return_url( $body["formUrl"] )
 					);
  
@@ -226,7 +226,7 @@ function ClicToPay_init_gateway_class() {
 			$variables_to_send = array(
 				'userName'          =>  $this->$ClicToPay_sandbox_Login,
 				'password'          =>  $this->$ClicToPay_sandbox_Password,
-				'orderId'       =>  $_GET["orderId"]
+				'orderId'           =>  $_GET["orderId"]
 			);
 
             		$redirect = 'https://test.clictopay.com/payment/rest/getOrderStatus.do';
