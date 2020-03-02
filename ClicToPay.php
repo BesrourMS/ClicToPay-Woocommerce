@@ -6,6 +6,8 @@
  * Author: Mohamed Safouan Besrour
  * Author URI: https://besrourms.github.io
  * Version: 1.0
+ * Text Domain: woo-clictopay
+ * Domain Path: /languages
  */
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
@@ -78,72 +80,72 @@ function ClicToPay_init_gateway_class() {
 
 		    $this->form_fields = array(
 			'enabled' => array(
-			    'title'   => __( 'Enable/Disable', $this->domain ),
+			    'title'   => __( 'Enable/Disable', 'woo-clictopay' ),
 			    'type'    => 'checkbox',
-			    'label'   => __( 'Enable ClicToPay Payment', $this->domain ),
+			    'label'   => __( 'Enable ClicToPay Payment', 'woo-clictopay' ),
 			    'default' => 'yes'
 			),
 			'title' => array(
-			    'title'       => __( 'Title', $this->domain ),
+			    'title'       => __( 'Title', 'woo-clictopay' ),
 			    'type'        => 'text',
-			    'description' => __( 'This controls the title which the user sees during checkout.', $this->domain ),
+			    'description' => __( 'This controls the title which the user sees during checkout.', 'woo-clictopay' ),
 			    'default'     => __( 'ClicToPay Payment', $this->domain ),
 			    'desc_tip'    => true,
 			),
 			'order_status' => array(
-			    'title'       => __( 'Order Status', $this->domain ),
+			    'title'       => __( 'Order Status', 'woo-clictopay' ),
 			    'type'        => 'select',
 			    'class'       => 'wc-enhanced-select',
-			    'description' => __( 'Choose whether status you wish after checkout.', $this->domain ),
+			    'description' => __( 'Choose whether status you wish after checkout.', 'woo-clictopay' ),
 			    'default'     => 'wc-completed',
 			    'desc_tip'    => true,
 			    'options'     => wc_get_order_statuses()
 			),
 			'description' => array(
-			    'title'       => __( 'Description', $this->domain ),
+			    'title'       => __( 'Description', 'woo-clictopay' ),
 			    'type'        => 'textarea',
-			    'description' => __( 'Payment method description that the customer will see on your checkout.', $this->domain ),
-			    'default'     => __('Payment Information', $this->domain),
+			    'description' => __( 'Payment method description that the customer will see on your checkout.', 'woo-clictopay' ),
+			    'default'     => __( 'Payment Information', 'woo-clictopay' ),
 			    'desc_tip'    => true,
 			),
 			'instructions' => array(
-			    'title'       => __( 'Instructions', $this->domain ),
+			    'title'       => __( 'Instructions', 'woo-clictopay' ),
 			    'type'        => 'textarea',
-			    'description' => __( 'Instructions that will be added to the thank you page and emails.', $this->domain ),
+			    'description' => __( 'Instructions that will be added to the thank you page and emails.', 'woo-clictopay' ),
 			    'default'     => '',
 			    'desc_tip'    => true,
 			),
 			'sandbox' => array(
-			    'title'   => __( 'Sandbox', $this->domain ),
+			    'title'   => __( 'Sandbox', 'woo-clictopay' ),
 			    'type'    => 'checkbox',
-			    'label'   => __( 'Enable/Disable Sandbox', $this->domain ),
+			    'label'   => __( 'Enable/Disable Sandbox', 'woo-clictopay' ),
 			    'default' => 'yes'
 			),
 			'sandbox_URL' => array(
-			    'title'       => __( 'Sandbox URL', $this->domain ),
+			    'title'       => __( 'Sandbox URL', 'woo-clictopay' ),
 			    'type'        => 'text',
-			    'description' => __( 'Sandbox URL', $this->domain ),
+			    'description' => __( 'Sandbox URL', 'woo-clictopay' ),
 			    'default'     => 'https://test.clictopay.com/payment/rest/register.do',
 			    'desc_tip'    => true,
 			),
 			'production_URL' => array(
-			    'title'       => __( 'Production URL', $this->domain ),
+			    'title'       => __( 'Production URL', 'woo-clictopay' ),
 			    'type'        => 'text',
-			    'description' => __( 'Production URL', $this->domain ),
+			    'description' => __( 'Production URL', 'woo-clictopay' ),
 			    'default'     => 'https://production.clictopay.com/payment/rest/register.do',
 			    'desc_tip'    => true,
 			),
 			'ClicToPay_sandbox_Login' => array(
-			    'title'       => __( 'Sandbox ClicToPay Login', $this->domain ),
+			    'title'       => __( 'Sandbox ClicToPay Login', 'woo-clictopay' ),
 			    'type'        => 'text',
-			    'description' => __( 'Login marchand reçu lors de l\'inscription.', $this->domain ),
+			    'description' => __( 'Login marchand reçu lors de l\'inscription.', 'woo-clictopay' ),
 			    'default'     => '',
 			    'desc_tip'    => true,
 			),
 			'ClicToPay_sandbox_Password' => array(
-			    'title'       => __( 'Sandbox ClicToPay Password', $this->domain ),
+			    'title'       => __( 'Sandbox ClicToPay Password', 'woo-clictopay' ),
 			    'type'        => 'password',
-			    'description' => __( 'Password marchand reçu lors de l\'inscription.', $this->domain ),
+			    'description' => __( 'Password marchand reçu lors de l\'inscription.', 'woo-clictopay' ),
 			    'default'     => '',
 			    'desc_tip'    => true,
 			),
