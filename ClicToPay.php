@@ -51,17 +51,16 @@ function ClicToPay_init_gateway_class() {
 		 
 			// Load the settings.
 			$this->init_settings();
-			$this->title = $this->get_option( 'title' );
 			
 			$this->title = $this->get_option( 'title' );
-            		$this->description = $this->get_option( 'description' );
-            		$this->instructions = $this->get_option( 'instructions', $this->description );
-            		$this->order_status = $this->get_option( 'order_status', 'processing' );
-            		$this->sandbox = $this->get_option( 'sandbox' );
-            		$this->sandbox_URL = $this->get_option( 'sandbox_URL' );
-            		$this->production_URL = $this->get_option( 'production_URL' );
-           		$this->ClicToPay_sandbox_Login = $this->get_option( 'ClicToPay_sandbox_Login' );
-            		$this->ClicToPay_sandbox_Password = $this->get_option( 'ClicToPay_sandbox_Password' );
+			$this->description = $this->get_option( 'description' );
+            $this->instructions = $this->get_option( 'instructions', $this->description );
+            $this->order_status = $this->get_option( 'order_status', 'processing' );
+            $this->sandbox = $this->get_option( 'sandbox' );
+            $this->sandbox_URL = $this->get_option( 'sandbox_URL' );
+            $this->production_URL = $this->get_option( 'production_URL' );
+           	$this->ClicToPay_sandbox_Login = $this->get_option( 'ClicToPay_sandbox_Login' );
+            $this->ClicToPay_sandbox_Password = $this->get_option( 'ClicToPay_sandbox_Password' );
 		 
 			// This action hook saves the settings
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -89,7 +88,7 @@ function ClicToPay_init_gateway_class() {
 			    'title'       => __( 'Title', 'woo-clictopay' ),
 			    'type'        => 'text',
 			    'description' => __( 'This controls the title which the user sees during checkout.', 'woo-clictopay' ),
-			    'default'     => __( 'ClicToPay Payment', $this->domain ),
+			    'default'     => __( 'ClicToPay Payment', 'woo-clictopay' ),
 			    'desc_tip'    => true,
 			),
 			'order_status' => array(
@@ -132,7 +131,7 @@ function ClicToPay_init_gateway_class() {
 			    'title'       => __( 'Production URL', 'woo-clictopay' ),
 			    'type'        => 'text',
 			    'description' => __( 'Production URL', 'woo-clictopay' ),
-			    'default'     => 'https://production.clictopay.com/payment/rest/register.do',
+			    'default'     => 'https://ipay.clictopay.com/payment/rest/register.do',
 			    'desc_tip'    => true,
 			),
 			'ClicToPay_sandbox_Login' => array(
@@ -163,7 +162,7 @@ function ClicToPay_init_gateway_class() {
 			// we need it to get any order detailes
 			$order = wc_get_order( $order_id );
  
-            		// Variables To Send
+            // Variables To Send
 
 
 			if($this->sandbox = true){
@@ -172,8 +171,8 @@ function ClicToPay_init_gateway_class() {
 				    'userName'          =>  $this->$ClicToPay_sandbox_Login,
 				    'password'          =>  $this->$ClicToPay_sandbox_Password,
 				    'orderNumber'       =>  $this->$order_id,
-				    'amount'            =>  $order->get_total();
-				    'currency'		=>  788;
+				    'amount'            =>  $order->get_total(),
+				    'currency'			=>  788
 				);
 
 				$redirect = $this->sandbox_URL;
@@ -184,8 +183,8 @@ function ClicToPay_init_gateway_class() {
 				    'userName'          =>  $this->$ClicToPay_production_Login,
 				    'password'          =>  $this->$ClicToPay_production_Password,
 				    'orderNumber'       =>  $this->$order_id,
-				    'amount'            =>  $order->get_total();
-				    'currency'		=>  788;
+				    'amount'            =>  $order->get_total(),
+				    'currency'			=>  788
 				);
 
 				$redirect = $this->production_URL;
@@ -231,7 +230,7 @@ function ClicToPay_init_gateway_class() {
 				'orderId'           =>  $_GET["orderId"]
 			);
 
-            		$redirect = 'https://test.clictopay.com/payment/rest/getOrderStatus.do';
+            $redirect = 'https://test.clictopay.com/payment/rest/getOrderStatus.do';
 			$response = wp_remote_post( $redirect, $variables_to_send );	
 			$args = array(
 				'transaction_id' => $_GET["orderId"],
