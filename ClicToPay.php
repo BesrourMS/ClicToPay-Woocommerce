@@ -14,51 +14,49 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-/*
- * This action hook registers our PHP class as a WooCommerce payment gateway
- */
 add_filter( 'woocommerce_payment_gateways', 'ClicToPay_add_gateway_class' );
 function ClicToPay_add_gateway_class( $gateways ) {
     $gateways[] = 'WC_ClicToPay_Gateway';
     return $gateways;
 }
 
-/*
- * The class itself, please note that it is inside plugins_loaded action hook
- */
 add_action( 'plugins_loaded', 'ClicToPay_init_gateway_class' );
 function ClicToPay_init_gateway_class() {
+    if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
+        return;
+    }
 
     class WC_ClicToPay_Gateway extends WC_Payment_Gateway {
+		
+		// Declare properties explicitly
+		public $instructions;
+		public $order_status;
+		public $sandbox;
+		public $sandbox_URL;
+		public $production_URL;
+		public $ClicToPay_sandbox_Login;
+		public $ClicToPay_sandbox_Password;
+		public $ClicToPay_production_Login;
+		public $ClicToPay_production_Password;
 
-        /**
-         * Class constructor, more about it in Step 3
-         */
+		
         public function __construct() {
-
-            $this->id = 'ClicToPay'; // payment gateway plugin ID
-            $this->icon = 'https://www.drupal.org/files/project-images/ClicToPay_logo.png'; // URL of the icon that will be displayed on the checkout page near your gateway name
-            $this->has_fields = false; // in case you need a custom credit card form
+            $this->id = 'clictopay';
+            $this->icon = 'https://www.drupal.org/files/project-images/ClicToPay_logo.png';
+            $this->has_fields = false;
             $this->method_title = 'ClicToPay Gateway';
-            $this->method_description = 'Description of ClicToPay payment gateway'; // will be displayed on the options page
-
-            // gateways can support subscriptions, refunds, saved payment methods,
-            // but in this tutorial, we begin with simple payments
+            $this->method_description = 'Accept Tunisian credit card payments on your store.';
             $this->supports = array(
                 'products'
             );
-
-            // Method with all the options fields
             $this->init_form_fields();
-
-            // Load the settings.
             $this->init_settings();
 
             $this->title = $this->get_option( 'title' );
             $this->description = $this->get_option( 'description' );
             $this->instructions = $this->get_option( 'instructions', $this->description );
             $this->order_status = $this->get_option( 'order_status', 'processing' );
-            $this->sandbox = $this->get_option( 'sandbox' );
+            $this->sandbox = $this->get_option( 'sandbox' ) === 'yes' ? true : false;
             $this->sandbox_URL = $this->get_option( 'sandbox_URL' );
             $this->production_URL = $this->get_option( 'production_URL' );
             $this->ClicToPay_sandbox_Login = $this->get_option( 'ClicToPay_sandbox_Login' );
@@ -66,12 +64,10 @@ function ClicToPay_init_gateway_class() {
             $this->ClicToPay_production_Login = $this->get_option( 'ClicToPay_production_Login' );
             $this->ClicToPay_production_Password = $this->get_option( 'ClicToPay_production_Password' );
 
-            // This action hook saves the settings
             add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+			add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'check_response' ) );
 
-            // You can also register a webhook here
-            add_action( 'woocommerce_api_wc_gateway_' . $this->id, array( $this, 'check_response' ) );
-        }
+		}
 
         /**
          * Plugin options, we deal with it in Step 3 too
@@ -219,43 +215,51 @@ function ClicToPay_init_gateway_class() {
          * Webhook for handling payment status
          */
         public function check_response() {
-            $order_id = $_GET['orderId'];
-            $order = wc_get_order( $order_id );
+			if ( empty( $_GET['orderId'] ) ) {
+				return;
+			}
 
-            if ( ! $order ) {
-                return;
-            }
+			$order_id = sanitize_text_field( $_GET['orderId'] );
+			
+			$body = array(
+				'userName' => $this->sandbox ? $this->ClicToPay_sandbox_Login : $this->ClicToPay_production_Login,
+				'password' => $this->sandbox ? $this->ClicToPay_sandbox_Password : $this->ClicToPay_production_Password,
+				'orderId'  => $order_id,
+			);
+						
+			$url = $this->sandbox ? 'https://test.clictopay.com/payment/rest/getOrderStatus.do' : 'https://ipay.clictopay.com/payment/rest/getOrderStatus.do';
 
-            // Verify payment status
-            $request_data = array(
-                'userName' => $this->sandbox ? $this->ClicToPay_sandbox_Login : $this->ClicToPay_production_Login,
-                'password' => $this->sandbox ? $this->ClicToPay_sandbox_Password : $this->ClicToPay_production_Password,
-                'orderId'  => $order_id,
-            );
 
-            $url = $this->sandbox ? 'https://test.clictopay.com/payment/rest/getOrderStatus.do' : 'https://ipay.clictopay.com/payment/rest/getOrderStatus.do';
+			$response = wp_remote_post( $url, array(
+				'method'    => 'POST',
+				'body'      => $body,
+				'timeout'   => 45,
+				'sslverify' => true,
+			) );
 
-            $response = wp_remote_post( $url, array(
-                'method'    => 'POST',
-                'body'      => $request_data,
-                'timeout'   => 45,
-                'sslverify' => false,
-            ) );
-
-            if ( is_wp_error( $response ) ) {
-                return;
-            }
-
-            $response_body = wp_remote_retrieve_body( $response );
-            $response_data = json_decode( $response_body, true );
-
-            if ( isset( $response_data['orderStatus'] ) && $response_data['orderStatus'] == 2 ) {
-                $order->payment_complete();
-                $order->reduce_order_stock();
-                wc_add_order_note( $order->get_id(), 'ClicToPay payment completed successfully.' );
-            } else {
-                wc_add_order_note( $order->get_id(), 'ClicToPay payment failed: ' . $response_data['errorMessage'] );
-            }
-        }
+			if ( is_wp_error( $response ) ) {
+				$error_message = $response->get_error_message();
+				echo "Error: $error_message";
+			}else {
+				$response_body = wp_remote_retrieve_body( $response );
+				$response_data = json_decode( $response_body, true );
+				$order_number = isset( $response_data['OrderNumber'] ) ? (int) $response_data['OrderNumber'] : 0; // Convert to integer
+				$order = wc_get_order( $order_number );
+				if ( isset( $response_data['OrderStatus'] ) && $response_data['OrderStatus'] == 2 ) {
+					if ( $order->is_paid() ) {
+						return;
+					}
+					$order->payment_complete();
+					wc_reduce_stock_levels( $order );
+					// Update order status based on the selected option
+					$new_status = isset( $this->order_status ) ? $this->order_status : 'wc-completed';
+					$order->update_status( $new_status ); // Update order status
+					$order->add_order_note('ClicToPay payment completed successfully : '.$order_id.' By : '.$response_data['Pan'] );
+				} else {
+					echo '<div class="woocommerce-error">Votre paiement n\'a pas été accepté. Veuillez réessayer ou contacter le support.</div>';
+					$order->add_order_note('ClicToPay payment failed: '.$order_id.' => ' . $response_data['ErrorMessage'] );
+				}
+			}
+		}
     }
 }
